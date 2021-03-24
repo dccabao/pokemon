@@ -21,6 +21,7 @@ const App = () => {
   const [status, setStatus] = useState('default');
 
   useEffect(() => {
+    addUpgrade();
     fetchMyAPI();
     console.log('offset', offset);
     return () => {
@@ -60,6 +61,29 @@ const App = () => {
     }
   };
 
+  const addUpgrade = () => {
+    var upgradedNames = 'Upgraded';
+    const pokemonNames = pokemonList.map(item => (upgradedNames += item.name));
+    console.log('upgraded', pokemonNames);
+  };
+
+  const onPickerSeleceted = value => {
+    setStatus(value);
+    switch (value) {
+      case 'upgrade':
+        console.log('upgrade');
+        break;
+      case 'imposter':
+        console.log('imposter');
+        break;
+      case 'ultimate':
+        console.log('ultimate');
+        break;
+      default:
+        handleRefresh();
+    }
+  };
+
   const DropDown = () => {
     return (
       <DropDownPicker
@@ -67,7 +91,6 @@ const App = () => {
           {
             label: 'Default',
             value: 'default',
-            hidden: true,
           },
           {
             label: 'Upgrade',
@@ -84,15 +107,30 @@ const App = () => {
         ]}
         defaultValue={status}
         containerStyle={{height: 40}}
-        style={{backgroundColor: '#fafafa'}}
+        style={{
+          borderWidth: 2,
+          borderTopLeftRadius: 10,
+          borderTopRightRadius: 10,
+          borderBottomLeftRadius: 10,
+          borderBottomRightRadius: 10,
+          borderColor: 'lightgray',
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 3,
+          },
+          shadowOpacity: 0.1,
+          shadowRadius: 0.41,
+        }}
         itemStyle={{
           justifyContent: 'flex-start',
         }}
-        dropDownStyle={{backgroundColor: '#fafafa'}}
-        onChangeItem={item => setStatus(item.value)}
+        dropDownStyle={{backgroundColor: 'white'}}
+        onChangeItem={item => onPickerSeleceted(item.value)}
       />
     );
   };
+
   const renderItem = data => (
     <TouchableOpacity style={{backgroundColor: 'skyblue'}}>
       <View style={styles.listItemContainer}>
@@ -105,21 +143,23 @@ const App = () => {
     <View style={styles.container}>
       <Text>List of pokemons by national dex:</Text>
       <DropDown />
-      {refreshing ? (
-        <Text>Fetching pokemon list</Text>
-      ) : (
-        <FlatList
-          data={pokemonList}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => {
-            item.name;
-          }}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          onEndReached={handleLoadMore}
-          onEndThreshold={0}
-        />
-      )}
+      <View style={{zIndex: -1, marginTop: 150}}>
+        {refreshing ? (
+          <Text>Fetching pokemon list</Text>
+        ) : (
+          <FlatList
+            data={pokemonList}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => {
+              item.name;
+            }}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            onEndReached={handleLoadMore}
+            onEndThreshold={0}
+          />
+        )}
+      </View>
     </View>
   );
 };
